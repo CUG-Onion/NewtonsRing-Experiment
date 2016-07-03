@@ -1,0 +1,233 @@
+%%%%%%%%%%%%%%%%%%%%%核心代码来自http://tex.stackexchange.com/a/159234
+\documentclass{standalone}%[varwidth=18cm,] mutlti=true [tikz]
+\RequirePackage{luatex85}
+\def\pgfsysdriver{pgfsys-pdftex.def}
+\usepackage{luatexja-fontspec}
+\usepackage{tikz}
+\usetikzlibrary{shapes,
+                calc,
+                fpu,
+                patterns,
+                decorations.pathreplacing,
+                arrows,
+                shapes.geometric,
+                decorations.pathmorphing,
+                spy,
+                backgrounds,
+                shapes.callouts,
+                decorations.fractals,
+                decorations.markings,
+                }
+\usepackage{pgfplots}
+    \usepgfplotslibrary{fillbetween}
+\usepackage{pdftexcmds}
+\usepackage{xparse}
+\usepackage{etoolbox}
+\usepackage{animate}
+\usepackage{amsmath}
+\usepackage{ifthen}
+\usepackage{tagging}
+        %\usetag{Draft} %显示所有标记 变量
+\usepackage{fp}
+\usepackage{graphicx}
+        \DeclareGraphicsExtensions{.pdf,.png,.jpg,.mps}
+%\usepackage{lua-visual-debug}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%载入命令 设置
+\makeatletter\input{NRConfig/Font.set}\makeatother %载入字体设置
+\makeatletter\input{NRConfig/TheBBCstyleCUG.set}\makeatother %BBC LOGO 形式 CUG LOGO
+\makeatletter\input{NRConfig/TikzVariables.tikzconfig}\makeatother %载入全局变量
+\makeatletter\input{NRConfig/FillPattern.tikzconfig}\makeatother %填充效果
+\makeatletter\input{NRConfig/HelpLines.tikzset}\makeatother %坐标辅助线
+\makeatletter\input{NRConfig/LaserBeamStyle.tikzset}\makeatother %线两边模糊效果
+\makeatletter\input{NRConfig/CoteFunction.tikzcmd}\makeatother      %CAD尺寸标记效果
+\makeatletter\input{NRConfig/DrawNewtonRing.tikzcmd}\makeatother    %画完整牛顿环0-\MaxRings环,并标识出每环水平方向左右两边 及左上 右上的标记点
+\makeatletter\input{NRConfig/IndicateRingNumber.tikzcmd}\makeatother %显示怎么数环
+\makeatletter\input{NRConfig/DmDsLmLsCote.tikzcmd}\makeatother      %标记Dm Ds Lm Ls 和它们之间的关系
+\makeatletter\input{NRConfig/DrawLenGlass.tikzcmd}\makeatother      %画产生牛顿环的实物示意图
+\makeatletter\input{NRConfig/DrawCross.tikzcmd}\makeatother         %画目镜十字线命令使用了线两边模糊效果,因此LaserBeamStyle.tikzset应先加载
+\makeatletter\input{NRConfig/ShowHowToTakeReading.tikzcmd}\makeatother %演示如何读数 m=\m,s=\s
+\makeatletter\input{NRConfig/TikzPictureStyleDefine.tikzset}\makeatother %预定义的形式
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usetag{0}%%%%%只有玻璃和透镜 光路
+%\usetag{1}%%%%装置 和牛顿环的像
+%\usetag{2}%%%%%%%仅装置但包含辅助线
+%\usetag{3}%%%%%怎么数环            %pdf动画单独一页standalone 选项为不要tikz
+    %\usetag{3ToSWF}%pdf动画每帧为一页单独输出  此时 standalone 选项必须加 tikz ,要转换swf文件时才使用此行
+%\usetag{4}%%%%dm ds lm ls 关系
+%\usetag{5}%怎么读数              %pdf动画单独一页standalone 选项为不要tikz
+    %\usetag{5ToSWF}%pdf动画每帧为一页单独输出    此时 standalone 选项必须加 tikz ,要转换swf文件时才使用此行 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\Logo}{\scalebox{0.05}{\includegraphics{NRConfig/CUGLogo}}}%校徽
+
+
+\begin{document}%
+%
+\pagecolor{yellow!50}%页面颜色 50%黄色
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tagged{0}{%只有玻璃和透镜
+            \begin{tikzpicture}%
+            \path[use as bounding box] (-6.2,-5.8) rectangle (6.2,4.85); %只显示该范围内图形
+            %\draw (-8,-8) to[grid with coordinates] (7,6); %坐标 网格辅助线
+            %%\DrawAFullNewtonRingsNormal
+            \DrawRingOnlyCoordinate%
+            %%\DrawLenGlassWithRings
+            \node at ($(0,-1.75*\CanvasH)+(CoorL\MaxRings|-CoorUU\MaxRings)$)[opacity=0.62,anchor=center] (Logo){\Logo};%
+            \node at (Logo)[yshift=20,scale=0.5]{\TheCUG};%
+            \DrawLenGlassWithoutAuxiliaryLine%
+            \end{tikzpicture}%
+}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tagged{1}{%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%牛顿环和装置
+            \begin{tikzpicture}%
+            \path[use as bounding box] (-6.0,-5.45) rectangle (6.0,21.45); %只显示该范围内图形
+            %\draw (-7,-5.6) to[grid with coordinates] (7,22); %坐标 网格辅助线
+            \DrawAFullNewtonRingsNormal%
+            \node at ($(0.15*\CanvasW,17.76*\CanvasH)+(CoorL\MaxRings|-CoorUU\MaxRings)$)[opacity=0.62,anchor=center](Logo) {\Logo};%
+            \node at (Logo)[yshift=20,scale=0.5]{\TheCUG};%
+            \DrawLenGlassWithRings%
+            \PutAnEye%
+            \end{tikzpicture}%
+}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tagged{2}{%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%装置和辅助线
+            \begin{tikzpicture}%
+            \path[use as bounding box] (-6.0,-5.62) rectangle (6.0,10.29); %只显示该范围内图形
+            %\draw (-7,-5.6) to[grid with coordinates] (7,10.25); %坐标 网格辅助线
+            \DrawRingOnlyCoordinate%
+            \node at ($(0.46*\CanvasW,-0.95*\CanvasH)+(CoorL\MaxRings|-CoorUU\MaxRings)$)[xshift=-18,yshift=135,opacity=0.62,anchor=center] (Logo){\Logo};%
+            \node at (Logo)[yshift=20,scale=0.5]{\TheCUG};%
+            \DrawLenGlassOnlyWithAuxiliaryLine%
+            \end{tikzpicture}%
+}%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pgfmathsetmacro{\IndicateNumberTotalFrame}{int(\PointOutRingMax+2)}%演示怎么数环时总帧数
+\tagged{3}{%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%怎么数环
+                                                %pdf动画
+            \begin{animateinline}[controls,%
+                                  %autoplay,%
+                                  %loop,%
+                                  buttonsize=1.8em,%
+                                  %poster=1,%
+                                  method=ocg,%
+                                  label=RingsRead,%
+                                  ]{0.75}%
+            \multiframe{\IndicateNumberTotalFrame}{n=1+1}{%\IndicateNumberTotalFrame
+                                                            \begin{tikzpicture}[]%
+                                                            \path[use as bounding box] (-5.45,-5.8) rectangle (5.45,5.45); %只显示该范围内图形
+                                                            %\draw (-6.2,-5.8) to[grid with coordinates] (6.2,5.8); %坐标 网格辅助线
+                                                            \DrawAFullNewtonRingsNormal%
+                                                            \node at ($(0.42*\CanvasW,-1.06*\CanvasH)+(CoorL\MaxRings|-CoorUU\MaxRings)$)[opacity=0.62,anchor=center] (Logo){\Logo};%
+                                                            \node at (Logo)[yshift=20,scale=0.5]{\TheCUG};
+                                                            \IndicateRingNumber%
+                                                            \end{tikzpicture}%
+                                                        }%
+            \end{animateinline}%
+}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tagged{3ToSWF}{%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%怎么数环
+                                                %swf动画
+            \foreach \i in {1,...,\IndicateNumberTotalFrame}{%\IndicateNumberTotalFrame
+                                                            \begin{tikzpicture}[]%
+                                                            \path[use as bounding box] (-5.45,-6.72) rectangle (5.45,5.5); %只显示该范围内图形
+                                                            %\draw (-6.2,-5.8) to[grid with coordinates] (6.2,5.8); %坐标 网格辅助线
+                                                            \DrawAFullNewtonRingsNormal%
+                                                            \node at ($(0.42*\CanvasW,-\CanvasH)+(CoorL\MaxRings|-CoorUU\MaxRings)$)[opacity=0.62,anchor=center] (Logo){\Logo};%
+                                                            \node at (Logo)[yshift=20,scale=0.5]{\TheCUG};%
+                                                            \IndicateRingNumber%
+                                                            \end{tikzpicture}%
+                                                            }%
+}%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tagged{4}{%
+%%%%%%%%%%%%%%%%%%%%%%%%%%dm ds lm ls 关系
+            \begin{tikzpicture}%
+            \path[use as bounding box] (-6.55,-6.4) rectangle (5.8,6.48); %只显示该范围内图形
+            %\draw (-7.0,-6.76) to[grid with coordinates] (5.4,6.48); %坐标 网格辅助线
+            \DrawRingMAndS%
+            \node at ($(-0.15*\CanvasW,0)+(CoorL\MaxRings|-CoorUU\MaxRings)$) [yshift=4,opacity=0.62,anchor=center] (Logo) {\Logo};%
+            \node at (Logo)[yshift=20,scale=0.5]{\TheCUG};%
+            \DmDsCote%
+            \LmLsCote%
+            \DmDsLmLsRelationship%
+            \end{tikzpicture}%
+}%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pgfmathsetmacro{\TakeReadingTotalFrame}{int(3*(\m+2)+1)}%演示怎么读数时总帧数
+\tagged{5}{%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%怎么测量dm ds
+                                               %pdf动画
+            \begin{animateinline}[controls,%
+                                  %autoplay,
+                                  %loop,
+                                  buttonsize=1.8em,%
+                                  %poster=1,%
+                                  method=ocg,%
+                                  label=TakeReading,%
+                                  ]{1}%
+            \multiframe{\TakeReadingTotalFrame}{N=1+1}{%73 %3 poster=1   \multiframe{\TakeReadingTotalFrame}{N=1+1}
+                                                \begin{tikzpicture}[spy using outlines={circle, magnification=6, connect spies,},]%%dash pattern= on 1 off 1
+                                                %\path[use as bounding box] (-6,-5.4) rectangle (6,6.48); %只显示该范围内图形
+                                                %\draw (-8,-8) to[grid with coordinates] (8,8); %坐标 网格辅助线
+                                                %\DrawAFullNewtonRingsShade%
+                                                \DrawAFullNewtonRingsNormal
+                                                %\DrawRingMAndS
+                                                \node at ($(-0.63*\CanvasW,0)+(CoorL\MaxRings|-CoorUU\MaxRings)$) [opacity=0.62,anchor=center] (Logo) {\Logo};
+                                                \node at (Logo)[yshift=20,scale=0.5]{\TheCUG};
+                                                \ShowHowToTakeReading
+                                                \end{tikzpicture}%
+                                                     }%fram结束
+            \end{animateinline}%
+}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tagged{5ToSWF}{%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%怎么测量dm ds
+                                        %swf动画
+            \foreach \i in {1,...,\TakeReadingTotalFrame}{% 1-\TakeReadingTotalFrame
+                                                            \begin{tikzpicture}[spy using outlines={circle, magnification=6, connect spies},]%dash pattern= on 1 off 1%
+                                                            %\DrawAFullNewtonRingsShade%
+                                                            \DrawAFullNewtonRingsNormal
+                                                            \node at ($(1.22*\CanvasW,-0.96*\CanvasH)-(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};%扩大画布放置播放按钮
+                                                            \node at ($(-0.63*\CanvasW,0)+(CoorL\MaxRings|-CoorUU\MaxRings)$) [opacity=0.62,anchor=center] (Logo) {\Logo};%放置Logo
+                                                            \node at (Logo)[yshift=20,scale=0.5]{\TheCUG};%放置CUG字母
+                                                            \ShowHowToTakeReading%
+                                                            \end{tikzpicture}%
+                                                            }%
+}%
+%
+\end{document} 

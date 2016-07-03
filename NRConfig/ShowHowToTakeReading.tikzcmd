@@ -1,0 +1,111 @@
+%演示如何读数 m=\m,s=\s
+
+
+\newcommand{\ZeroRingDis}{
+        \node at (NRCenter){\DrawCross};
+        \node[red] at (CenterRingNumberDis) {\Large{\FontYanZhenQing 第$\mbox{\FontGillSans 0}$环}};
+        %\draw[dash pattern= on 1 off 1,color=red]  ($(CenterRingNumberDis)-(0,0.2)$)--($(NRCenter)+(0,0.4)$);
+        \tagged{Draft}{\node at ($(CenterRingNumberDis)+(0,0.3)$) {\scriptsize{\FontBakerSignetBT kk=?,k=\k,C0=\arabic{TheCrossCounter0},C1=\arabic{TheCrossCounter1},tmp=\tmp,Gkk=\Gkk,GCyc=\GCyc}};}
+}
+\newcommand{\LeftRingDis}{
+        \node at (CoorL\kk){\DrawCross};
+        \node[red] at (CoorL\kk|-CenterRingNumberDis) {\Large{\FontYanZhenQing 第$\mbox{\FontGillSans \kk}$环}}; % （x1,y1）|-(x2,y2) =(x1,y2)
+        %\draw[dash pattern= on 1 off 1,color=red]  ($(CoorL\kk|-CenterRingNumberDis)-(0,0.2)$)--($(CoorL\kk)+(0,0.4)$);
+        \tagged{Draft}{\node at ($(CoorL\kk|-CenterRingNumberDis)+(0,0.3)$) {\scriptsize{\FontBakerSignetBT kk=\kk,k=\k,C0=\arabic{TheCrossCounter0},C1=\arabic{TheCrossCounter1},tmp=\tmp,Gkk=\Gkk,GCyc=\GCyc}};}
+}
+\newcommand{\RightRingDis}{
+        \node at (CoorR\kk){\DrawCross};
+        \node[red] at (CoorR\kk|-CenterRingNumberDis) {\Large{\FontYanZhenQing 第$\mbox{\FontGillSans \kk}$环}}; % （x1,y1）|-(x2,y2) =(x1,y2)
+        %\draw[dash pattern= on 1 off 1,color=red]  ($(CoorR\kk|-CenterRingNumberDis)-(0,0.2)$)--($(CoorR\kk)+(0,0.4)$);
+        \tagged{Draft}{\node at ($(CoorR\kk|-CenterRingNumberDis)+(0,0.3)$) {\scriptsize{\FontBakerSignetBT kk=\kk,k=\k,C0=\arabic{TheCrossCounter0},C1=\arabic{TheCrossCounter1},tmp=\tmp,Gkk=\Gkk,GCyc=\GCyc}};}
+}
+
+
+\newcounter{TheCrossCounter0}
+\setcounter{TheCrossCounter0}{0} %初始值为0
+\newcounter{TheCrossCounter1}
+\setcounter{TheCrossCounter1}{-1}%初始值为-1
+
+\newcommand{\ShowHowToTakeReading}{
+
+\pgfmathsetmacro{\k}{\number\value{TheCrossCounter0}} %不使用n,而是使用计数器
+\pgfmathsetmacro{\tmp}{\number\value{TheCrossCounter1}}
+\pgfmathsetmacro{\ReadXsXmNumberIndicateYshift}{\MaxRings/28*15}%数环数时环数显示位置与最外边圆的距离
+\coordinate (CenterRingNumberDis) at ([yshift=\ReadXsXmNumberIndicateYshift]CoorUU\MaxRings);
+\xdef\Gkk{0}            %全局变量
+\xdef\GCyc{0}
+
+\ifnumcomp{\k}{>}{0}{%\k>0为真
+ \ifnumcomp{\k}{=}{1}{
+        \ZeroRingDis %第一帧不显示
+    }{
+            \pgfmathsetmacro{\kk}{int(mod(\tmp,\m+3))}%%% 第0-24环---左 k=25，kk=24
+            \pgfmathsetmacro{\CycleTime}{div(int(\tmp),\m+3))} %%第一次数到24环，\CycleTime=1
+                    \global\let\GCyc\CycleTime
+            \ifnumcomp{\CycleTime}{=}{0}{
+                                            \LeftRingDis  \global\let\Gkk\kk   %\global\let\GCyc\CycleTime %将\kk 和\CycleTime传出
+                                        }{}%若\CycleTime=0，说明一直画到第\m环
+            \ifnumcomp{\CycleTime}{=}{1}{%\CycleTime=1，说明到了第左\m环，此时向右移动到左第一
+                           \pgfmathsetmacro{\kk}{int(\m+2-\kk)}% 先往左数\m环, 如果已数到第\m 环则需要往右边移动了,即k=\m+2-\kk
+                                    \global\let\Gkk\kk
+                           \ifnumcomp{\kk}{=}{0}{%若\CycleTime=1,且\kk=0,说明到了0 环，标识第0环
+                                \ZeroRingDis %\global\let\Gkk\kk   %\global\let\GCyc\CycleTime %将\kk 和\CycleTime传出
+                                }{%\CycleTime=1,且\kk!=0,继续画左边\kk=24-\kk
+                                \LeftRingDis %\global\let\Gkk\kk   %\global\let\GCyc\CycleTime %将\kk 和\CycleTime传出
+                                }
+                            %%%需要记下数据的点 左边
+                           \ifnumcomp{\Gkk}{=}{\s}{\node[ReadPointIndicate,callout absolute pointer={($(CoorL\Gkk)+(0,-0.382)$)}]  at ($(0,-1.3)-(CoorR\s|-CoorUU\s)$)  {\Large{\FontYanZhenQing 记下此时读数：$x_{{\scriptsize s\mbox{左}}}$}}; }{}
+                           \ifnumcomp{\Gkk}{=}{\m}{\node[ReadPointIndicate,callout absolute pointer={($(CoorL\Gkk)+(0,-0.382)$)}]  at ($(0,-1.3)-(CoorR\m|-CoorUU\s)$)  {\Large{\FontYanZhenQing 记下此时读数：$x_{{\scriptsize m\mbox{左}}}$}}; }{}
+                        }%\CycleTime=1 为真结束
+                        {
+                          %\CycleTime=1 为假开始
+                        }
+            \ifnumcomp{\CycleTime}{=}{2}{%\CycleTime=2, 说明需要往右移动了,但此时\kk=0,因此需要让\kk=1
+                            \pgfmathsetmacro{\kk}{int(\kk+1)} \global\let\Gkk\kk   %\global\let\GCyc\CycleTime %将\kk 和\CycleTime传出
+                            \RightRingDis
+                            %%%需要记下数据的点 右边
+                           \ifnumcomp{\Gkk}{=}{\s}{\node[ReadPointIndicate,callout absolute pointer={($(CoorR\Gkk)+(0,-0.382)$)}]  at ($(0,-1.3)-(CoorL\s|-CoorUU\s)$)  {\Large{\FontYanZhenQing 记下此时读数：$x_{{\scriptsize s\mbox{右}}}$}}; }{}
+                           \ifnumcomp{\Gkk}{=}{\m}{\node[ReadPointIndicate,callout absolute pointer={($(CoorR\Gkk)+(0,-0.382)$)}]  at ($(0,-1.3)-(CoorL\m|-CoorUU\s)$)  {\Large{\FontYanZhenQing 记下此时读数：$x_{{\scriptsize m\mbox{右}}}$}}; }{}
+            }%%\CycleTime=2 为真结束
+            {
+            %\CycleTime=1 为假开始
+            }
+    }}{%\k>0不为真
+    }
+ %\spy [blue, size=220,latex-]  on  (CoorL\kk) in node[fill=white] at ($(CoorL\kk) + (-7.75,8) $);
+
+\stepcounter{TheCrossCounter0}
+\stepcounter{TheCrossCounter1}
+\pgfmathsetmacro{\SpyShowPointShiftY}{3.5} \global\let\SpyShowPointShiftY\SpyShowPointShiftY
+\ifnumcomp{\k}{>}{0}{%\k>0为真
+%     \ifnumcomp{\k}{=}{1}{%\k=1第一帧不显示鹰眼
+%                        }{
+        \ifnumcomp{\Gkk}{=}{0}{%中心环
+                                \spy [SpyStyle]  on  (NRCenter) in node[fill=yellow!50] at  ($(NRCenter)+(0,\SpyShowPointShiftY)$);
+                             }{
+                                \ifnumcomp{\GCyc}{=}{2}{%右边环
+                                \pgfmathsetmacro{\tmp}{int(div(\Gkk,1)*1)} \global\let\Gtmp\tmp %\spy 只能使用全局变量
+                                \spy [SpyStyle]  on  ($(CoorR\Gkk)$) in node[fill=yellow!50] at  ($(CoorR\Gtmp)+(0,\SpyShowPointShiftY)$);
+                                                    }{ %%%左边环
+                                 \pgfmathsetmacro{\tmp}{int(div(\Gkk,1)*1)} \global\let\Gtmp\tmp
+                                 \spy [SpyStyle]  on  ($(CoorL\Gkk)$) in node[fill=yellow!50] at  ($(CoorL\Gtmp)+(0,\SpyShowPointShiftY)$);
+                                                    }
+                            }
+                        %}
+                    }{%\k>0不为真
+                   }
+                %以下为DeBug
+            \ifnumcomp{\k}{=}{1}{
+                %\usetag{DeBug}
+            \tagged{DeBug}{
+                \node [ReadPointIndicate,callout absolute pointer={($(CoorL\s)+(0,-0.382)$)}] at ($(0,-1.3)-(CoorR\s|-CoorUU\s)$)  {\Large{\FontYanZhenQing 记下此时读数：$x_{{\scriptsize s\mbox{左}}}$}};
+                \node [ReadPointIndicate,callout absolute pointer={($(CoorL\m)+(0,-0.382)$)}] at ($(0,-1.3)-(CoorR\m|-CoorUU\s)$)  {\Large{\FontYanZhenQing 记下此时读数：$x_{{\scriptsize m\mbox{左}}}$}};
+                \node [ReadPointIndicate,callout absolute pointer={($(CoorR\s)+(0,-0.382)$)}] at ($(0,-1.3)-(CoorL\s|-CoorUU\s)$)  {\Large{\FontYanZhenQing 记下此时读数：$x_{{\scriptsize s\mbox{右}}}$}};
+                \node [ReadPointIndicate,callout absolute pointer={($(CoorR\m)+(0,-0.382)$)}] at ($(0,-1.3)-(CoorL\m|-CoorUU\s)$)  {\Large{\FontYanZhenQing 记下此时读数：$x_{{\scriptsize m\mbox{右}}}$}};
+                \spy [SpyStyle]  on  ($(CoorR\m)$) in node[fill=yellow!50] at  ($(CoorR\m)+(0,\SpyShowPointShiftY)$);
+                \spy [SpyStyle]  on  ($(CoorL\m)$) in node[fill=yellow!50] at  ($(CoorL\m)+(0,\SpyShowPointShiftY)$);
+
+                        }
+                        }{}
+                        %%以上为DeBug 在 poster=1 时直接显示
+}

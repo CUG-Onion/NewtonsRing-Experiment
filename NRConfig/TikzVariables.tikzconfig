@@ -1,0 +1,20 @@
+%全局的变量
+
+\pgfmathsetmacro{\MaxRings}{29}%最多画多少环 \MaxRings>=\m+2
+\global\let\MaxRings\MaxRings
+
+\pgfmathsetmacro{\Rad}{23}%有水平直径的夹角,用于标出l_s l_m
+\global\let\Rad\Rad
+
+
+%%%%%%%%%%%%%%%%测量的环
+\pgfmathsetmacro{\m}{25}%m的值
+\global\let\m\m
+\pgfmathsetmacro{\s}{15}%s的值
+\global\let\s\s
+
+%%%%%%%%%%%%%%%怎么数环,标识到第几环
+\pgfmathsetmacro{\PointOutRingMax}{9}%演示怎么数环时演示到第8环, 第九环显示点
+\global\let\PointOutRingMax\PointOutRingMax
+
+

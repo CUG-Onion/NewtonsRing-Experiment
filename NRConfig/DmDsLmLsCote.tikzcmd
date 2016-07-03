@@ -1,0 +1,52 @@
+\newcommand{\DmDsCote}{
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%标记Dm Ds Lm Ls 和它们之间的关系
+%%%%%%%%%%%%%环直径 m=\m,s=\s
+%ds
+\draw[DrawDiaSStyle] (CoorL\s)--(CoorR\s);
+\Cote*[0.79]{([yshift=-2]CoorL\s)}{([yshift=-2]CoorR\s)}{$d_s$}[Cote node/.append style={line width=20,above=-1,fill=none}]
+%dm
+\draw[DrawDiaMStyle] (CoorL\m)--(CoorR\m);
+\Cote*[0.55]{([yshift=-2]CoorL\m)}{([yshift=-2]CoorR\m)}{$d_m$}[Cote node/.append style={line width=20,above=-1,fill=none}]
+    
+ }
+ 
+ \newcommand{\LmLsCote}{
+\coordinate (LmLeft) at (CoorLU\m); % lm左
+\coordinate (LmRight) at (CoorRU\m);  % lm右
+\coordinate (CenterDm) at ($(LmLeft)!(NRCenter)!(LmRight)$); %lm中心 
+ \pgfmathsetmacro{\TheL}{sqrt(pow(sqrt(\s*\M),2)-pow(sqrt(\m*\M)*sin(\Rad),2))}% left of ls //sqrt(Rs^2-(Rm*sin(\Rad))^2)
+\coordinate (LsLeft) at ($(CenterDm)+(-\TheL,0)$);
+\coordinate (LsRight) at ($(CenterDm)+(\TheL,0)$);
+
+ 
+ %ls
+%\draw[DrawLSStyle](LsLeft)--(LsRight);
+\CoteRed*[-0.62]{([yshift=-2]LsLeft)}{([yshift=-2]LsRight)}{$l_s$}[CoteRed node/.append style={line width=20,above=-1,fill=none}]
+%lm
+\draw[DrawLMStyle] (LmLeft)--(LmRight);
+\CoteRed*[-0.39]{([yshift=-2]LmLeft)}{([yshift=-2]LmRight)}{$l_m$}[CoteRed node/.append style={line width=20,above=-1,fill=none}] 
+ }
+ 
+\newcommand{\DmDsLmLsRelationship}{
+
+%%%%%%%%%%%%%dm与lm几何关系
+\draw[color=blue,line width=1] (NRCenter)--(CenterDm);%h线
+\draw[color=purple,line width=1] ([yshift=-5,]CenterDm)-|([xshift=5]CenterDm);%垂直
+\draw[color=black,line width=1] (NRCenter)--(LmLeft);
+ %%%%%%%%%%%%%ds与ls几何关系
+\draw[color=black,line width=1] (NRCenter)--(LsRight);
+
+%%%%%%%%%%%%%%%%%%%%h  dm/2 lm/2
+  \draw [color=blue,,decorate,decoration={brace,amplitude=4,mirror}] (CenterDm)--(NRCenter)node[midway,xshift=-7]{$h$};
+ \draw [color=red,,decorate,decoration={brace,amplitude=6}] (CenterDm)--(LsRight)node[midway,yshift=13]{$\frac{l_s}{2}$};
+  \draw [color=black,,decorate,decoration={brace,amplitude=6}] (LsRight)--(NRCenter)node[midway,xshift=9,yshift=-9,rotate=30]{$\frac{d_s}{2}$};
+  %%%%%%%%%ds/2 ls/2
+ \draw [color=red,,decorate,decoration={brace,amplitude=6,}] (CenterDm)--(LmLeft)node[midway,yshift=-13]{$\frac{l_m}{2}$};
+ \draw [draw=black,color=black,,decorate,decoration={brace,amplitude=6,mirror}] (LmLeft)--(NRCenter)node[midway,xshift=-6,yshift=-10,rotate=-12]{$\frac{d_m}{2}$};
+ 
+ 
+ 
+ }

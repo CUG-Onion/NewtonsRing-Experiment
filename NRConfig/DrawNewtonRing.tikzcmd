@@ -1,0 +1,225 @@
+%核心代码来自http://tex.stackexchange.com/questions/158668/nice-scientific-pictures-show-off/212936
+
+%画完整牛顿环0-28环,并标识出每环水平方向左右两边 及左上 右上的标记点
+
+\pgfmathsetmacro{\CanvasW}{1.9}%画布左右边缘增加 \CanvasW  \m=22时 1.65
+\pgfmathsetmacro{\CanvasH}{0.85}%画布上下边缘增加 \CanvasH
+
+
+
+\pgfmathsetmacro{\lambd}{1}%波长 r^2=kR*lambd
+\pgfmathsetmacro{\R}{1}%透镜曲率半径
+\pgfmathsetmacro{\M}{\lambd*\R}%R*lambd
+\pgfmathsetmacro{\CenterRadial}{0.75}%第0环半径
+\pgfmathsetmacro{\FirstRadial}{{sqrt(1*\M)}}%第一环(k=1)半径 
+
+\newcommand{\DrawAFullNewtonRingsShade}{% 0-\m实,\m-1环~\MaxRings淡
+%中心暗斑%
+  \draw [ZeroRing] (0,0) circle (\CenterRadial);
+     \coordinate (NRCenter) at (0,0);
+     \coordinate (CoorL0) at ($(NRCenter)+(-\CenterRadial,0)$);
+     \coordinate (CoorR0) at ($(NRCenter)+(\CenterRadial,0)$);
+     \coordinate (CoorUU0) at ($(NRCenter)+(0,\CenterRadial)$);
+     \coordinate (CoorLU0) at ($(NRCenter)+({-\CenterRadial*cos(\Rad)},{\CenterRadial*sin(\Rad)})$);
+     \coordinate (CoorRU0) at ($(NRCenter)+({\CenterRadial*cos(\Rad)},{\CenterRadial*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorLU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorUU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorR0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorL0) {\tiny{\FontGillSans 0}};}
+%第一环
+  \draw[FirstRing] (NRCenter) circle  (\FirstRadial);
+     \coordinate (CoorL1) at ($(NRCenter)+(-\FirstRadial,0)$);
+     \coordinate (CoorR1) at ($(NRCenter)+(\FirstRadial,0)$);
+     \coordinate (CoorUU1) at ($(NRCenter)+(0,\FirstRadial)$);
+     \coordinate (CoorLU1) at ($(NRCenter)+({-\FirstRadial*cos(\Rad)},{\FirstRadial*sin(\Rad)})$);
+     \coordinate (CoorRU1) at ($(NRCenter)+({\FirstRadial*cos(\Rad)},{\FirstRadial*sin(\Rad)})$);
+\tagged{Draft}{  \node[font=\scriptsize,red] at (CoorRU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorLU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorUU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorR1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorL1) {\tiny{\FontGillSans 1}};}
+  %%%%第二至22环
+  \foreach \k in {2,...,\m}{
+  \pgfmathsetmacro{\rk}{sqrt(\k*\M)}%第k环半径
+     \draw[OtherRing] (NRCenter) circle({\rk});
+     %弦长标记点 右：CoorR 左：CoorL  左上:CoorLU   右上:  CoorRU
+     \coordinate (CoorL\k) at ($(NRCenter)+({-\rk},0)$);
+     \coordinate (CoorR\k) at ($(NRCenter)+({\rk},0)$);
+     \coordinate (CoorUU\k) at ($(NRCenter)+(0,{\rk})$);
+     \coordinate (CoorLU\k) at ($(NRCenter)+({-\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+     \coordinate (CoorRU\k) at ($(NRCenter)+({\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorLU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorUU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorR\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorL\k) {\FontGillSans \k};}
+  }%{(20*\R)/pow(\k*\M,2)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%第\m+1环至\MaxRings环
+\pgfmathsetmacro{\mNextRing}{int(\m+1)}%\m环下一环
+\foreach \k in {\mNextRing,...,\MaxRings}{
+      \pgfmathsetmacro{\rk}{sqrt(\k*\M)}%第k环半径
+     \draw[ShadeRing] (NRCenter) circle({\rk});
+     %弦长标记点 右：CoorR 左：CoorL  左上:CoorLU   右上:     CoorRU
+     \coordinate (CoorL\k) at ($(NRCenter)+({-\rk},0)$);
+     \coordinate (CoorR\k) at ($(NRCenter)+({\rk},0)$);
+     \coordinate (CoorUU\k) at ($(NRCenter)+(0,{\rk})$);
+     \coordinate (CoorLU\k) at ($(NRCenter)+({-\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+     \coordinate (CoorRU\k) at ($(NRCenter)+({\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorLU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorUU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorR\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorL\k) {\FontGillSans \k};}
+  }
+  %%%在环外node 固定画布大小
+  \node at ($(-1.22*\CanvasW,\CanvasH)+(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};
+  \node at ($(1.22*\CanvasW,-0*\CanvasH)-(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};
+}
+
+\newcommand{\DrawAFullNewtonRingsNormal}{%0-\MaxRings均为实
+%中心暗斑
+  \draw [ZeroRing] (0,0) circle (\CenterRadial);
+     \coordinate (NRCenter) at (0,0);
+     \coordinate (CoorL0) at ($(NRCenter)+(-\CenterRadial,0)$);
+     \coordinate (CoorR0) at ($(NRCenter)+(\CenterRadial,0)$);
+     \coordinate (CoorUU0) at ($(NRCenter)+(0,\CenterRadial)$);
+     \coordinate (CoorLU0) at ($(NRCenter)+({-\CenterRadial*cos(\Rad)},{\CenterRadial*sin(\Rad)})$);
+     \coordinate (CoorRU0) at ($(NRCenter)+({\CenterRadial*cos(\Rad)},{\CenterRadial*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorLU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorUU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorR0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorL0) {\tiny{\FontGillSans 0}};}
+%第一环
+  \draw[FirstRing] (NRCenter) circle   (\FirstRadial);
+     \coordinate (CoorL1) at ($(NRCenter)+(-\FirstRadial,0)$);
+     \coordinate (CoorR1) at ($(NRCenter)+(\FirstRadial,0)$);
+     \coordinate (CoorUU1) at ($(NRCenter)+(0,\FirstRadial)$);
+     \coordinate (CoorLU1) at ($(NRCenter)+({-\FirstRadial*cos(\Rad)},{\FirstRadial*sin(\Rad)})$);
+     \coordinate (CoorRU1) at ($(NRCenter)+({\FirstRadial*cos(\Rad)},{\FirstRadial*sin(\Rad)})$);
+\tagged{Draft}{  \node[font=\scriptsize,red] at (CoorRU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorLU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorUU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorR1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorL1) {\tiny{\FontGillSans 1}};}
+  %%%%第二至22环
+  \foreach \k in {2,...,\MaxRings}{
+      \pgfmathsetmacro{\rk}{sqrt(\k*\M)}%第k环半径
+     \draw[OtherRing] (NRCenter) circle({\rk});
+     %弦长标记点 右：CoorR 左：CoorL  左上:CoorLU   右上:  CoorRU
+     \coordinate (CoorL\k) at ($(NRCenter)+({-\rk},0)$);
+     \coordinate (CoorR\k) at ($(NRCenter)+({\rk},0)$);
+     \coordinate (CoorUU\k) at ($(NRCenter)+(0,{\rk})$);
+     \coordinate (CoorLU\k) at ($(NRCenter)+({-\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+     \coordinate (CoorRU\k) at ($(NRCenter)+({\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorLU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorUU\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorR\k) {\FontGillSans \k};
+     \node[font=\scriptsize,red] at (CoorL\k) {\FontGillSans \k};}
+  }
+  %%%在环外node 固定画布大小
+  \node at ($(-1.22*\CanvasW,\CanvasH)+(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};
+  \node at ($(1.22*\CanvasW,-0*\CanvasH)-(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};
+}
+
+\newcommand{\DrawRingMAndS}{%只画出\m和\s环
+%除\s \m外不画出但所有坐标需要保留
+  %\draw [ZeroRing] (NRCenter) circle (\CenterRadial);
+    \coordinate (NRCenter) at (0,0);
+     \coordinate (CoorL0) at ($(NRCenter)+(-\CenterRadial,0)$);
+     \coordinate (CoorR0) at ($(NRCenter)+(\CenterRadial,0)$);
+     \coordinate (CoorUU0) at ($(NRCenter)+(0,\CenterRadial)$);
+     \coordinate (CoorLU0) at ($(NRCenter)+({-\CenterRadial*cos(\Rad)},{\CenterRadial*sin(\Rad)})$);
+     \coordinate (CoorRU0) at    ($(NRCenter)+({\CenterRadial*cos(\Rad)},{\CenterRadial*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU0) {\tiny{\FontGillSans 0}}; 
+     \node[font=\scriptsize,red] at (CoorLU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorUU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorR0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorL0) {\tiny{\FontGillSans 0}};}
+  %第一环
+  %\draw[FirstRing] (NRCenter) circle  (\FirstRadial);
+     \coordinate (CoorL1) at ($(NRCenter)+(-\FirstRadial,0)$);
+     \coordinate (CoorR1) at ($(NRCenter)+(\FirstRadial,0)$);
+     \coordinate (CoorUU1) at ($(NRCenter)+(0,\FirstRadial)$);
+     \coordinate (CoorLU1) at ($(NRCenter)+({-\FirstRadial*cos(\Rad)},{\FirstRadial*sin(\Rad)})$);
+     \coordinate (CoorRU1) at  ($(NRCenter)+({\FirstRadial*cos(\Rad)},{\FirstRadial*sin(\Rad)})$);
+\tagged{Draft}{  \node[font=\scriptsize,red] at (CoorRU1) {\tiny{\FontGillSans 1}}; 
+     \node[font=\scriptsize,red] at (CoorLU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorUU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorR1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorL1) {\tiny{\FontGillSans 1}};}
+  %%%%第二至22环
+  \foreach \k in {2,...,\MaxRings}{
+    %画指定的环，其它不画出但标定坐标
+      \pgfmathsetmacro{\rk}{sqrt(\k*\M)}%第k环半径
+    \foreach \tmp in {\s,\m}{
+    \ifnumcomp{\k}{=}{\tmp}{
+     \draw[OtherRing] (NRCenter) circle({sqrt(\tmp*\M)});}{}}
+     %弦长标记点 右：CoorR 左：CoorL  左上:CoorLU   右上:CoorRU
+     \coordinate (CoorL\k) at ($(NRCenter)+({-\rk},0)$);
+     \coordinate (CoorR\k) at ($(NRCenter)+({\rk},0)$);
+     \coordinate (CoorUU\k) at ($(NRCenter)+(0,{\rk})$);
+     \coordinate (CoorLU\k) at ($(NRCenter)+({-\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+     \coordinate (CoorRU\k) at ($(NRCenter)+({\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU\k) {\tiny{\FontGillSans \k}}; 
+     \node[font=\scriptsize,red] at (CoorLU\k) {\tiny{\FontGillSans \k}};
+     \node[font=\scriptsize,red] at (CoorUU\k) {\tiny{\FontGillSans \k}};
+     \node[font=\scriptsize,red] at (CoorR\k) {\tiny{\FontGillSans \k}};
+     \node[font=\scriptsize,red] at (CoorL\k) {\tiny{\FontGillSans \k}};}
+                                }%
+  %%%在环外node 固定画布大小
+  \node at ($(-\CanvasW,\CanvasH)+(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};
+  \node at ($(\CanvasW,-\CanvasH)-(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};
+}
+
+\newcommand{\DrawRingOnlyCoordinate}{%只标定坐标
+%不画出但所有坐标需要保留
+  %\draw [ZeroRing] (NRCenter) circle (\CenterRadial);
+    \coordinate (NRCenter) at (0,0);
+     \coordinate (CoorL0) at ($(NRCenter)+(-\CenterRadial,0)$);
+     \coordinate (CoorR0) at ($(NRCenter)+(\CenterRadial,0)$);
+     \coordinate (CoorUU0) at ($(NRCenter)+(0,\CenterRadial)$);
+     \coordinate (CoorLU0) at ($(NRCenter)+({-\CenterRadial*cos(\Rad)},{\CenterRadial*sin(\Rad)})$);
+     \coordinate (CoorRU0) at    ($(NRCenter)+({\CenterRadial*cos(\Rad)},{\CenterRadial*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU0) {\tiny{\FontGillSans 0}}; 
+     \node[font=\scriptsize,red] at (CoorLU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorUU0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorR0) {\tiny{\FontGillSans 0}};
+     \node[font=\scriptsize,red] at (CoorL0) {\tiny{\FontGillSans 0}};}
+  %第一环
+  %\draw[FirstRing] (NRCenter) circle  (\FirstRadial);
+     \coordinate (CoorL1) at ($(NRCenter)+(-\FirstRadial,0)$);
+     \coordinate (CoorR1) at ($(NRCenter)+(\FirstRadial,0)$);
+     \coordinate (CoorUU1) at ($(NRCenter)+(0,\FirstRadial)$);
+     \coordinate (CoorLU1) at ($(NRCenter)+({-\FirstRadial*cos(\Rad)},{\FirstRadial*sin(\Rad)})$);
+     \coordinate (CoorRU1) at  ($(NRCenter)+({\FirstRadial*cos(\Rad)},{\FirstRadial*sin(\Rad)})$);
+\tagged{Draft}{  \node[font=\scriptsize,red] at (CoorRU1) {\tiny{\FontGillSans 1}}; 
+     \node[font=\scriptsize,red] at (CoorLU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorUU1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorR1) {\tiny{\FontGillSans 1}};
+     \node[font=\scriptsize,red] at (CoorL1) {\tiny{\FontGillSans 1}};}
+  %%%%第二至22环
+  \foreach \k in {2,...,\MaxRings}{
+      \pgfmathsetmacro{\rk}{sqrt(\k*\M)}%第k环半径
+     %弦长标记点 右：CoorR 左：CoorL  左上:CoorLU   右上:CoorRU
+     \coordinate (CoorL\k) at ($(NRCenter)+({-\rk},0)$);
+     \coordinate (CoorR\k) at ($(NRCenter)+({\rk},0)$);
+     \coordinate (CoorUU\k) at ($(NRCenter)+(0,{\rk})$);
+     \coordinate (CoorLU\k) at ($(NRCenter)+({-\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+     \coordinate (CoorRU\k) at ($(NRCenter)+({\rk*cos(\Rad)},{\rk*sin(\Rad)})$);
+\tagged{Draft}{\node[font=\scriptsize,red] at (CoorRU\k) {\tiny{\FontGillSans \k}}; 
+     \node[font=\scriptsize,red] at (CoorLU\k) {\tiny{\FontGillSans \k}};
+     \node[font=\scriptsize,red] at (CoorUU\k) {\tiny{\FontGillSans \k}};
+     \node[font=\scriptsize,red] at (CoorR\k) {\tiny{\FontGillSans \k}};
+     \node[font=\scriptsize,red] at (CoorL\k) {\tiny{\FontGillSans \k}};}
+                                }%
+  %%%在环外node 固定画布大小
+  \node at ($(-\CanvasW,\CanvasH)+(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};
+  \node at ($(\CanvasW,-\CanvasH)-(CoorLU\MaxRings|-CoorUU\MaxRings)$) {\tagged{Draft}{\tikz\draw[fill=red,color=red] circle(2pt);}{}};
+}
+
+
+
+

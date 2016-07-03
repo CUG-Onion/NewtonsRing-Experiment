@@ -1,0 +1,21 @@
+\newfontfamily\FontGillSans[%BBC
+    Path           = ./Fonts/,
+    Extension      = .otf,
+    Ligatures      = TeX,
+    BoldFont       = GillSansStd-Bold,
+    ItalicFont     = GillSansStd-Italic
+]{GillSansStd}
+
+\newfontfamily\FontBakerSignetBT[%Sign  %https://www.zhihu.com/question/20111764
+    Path           = ./Fonts/,
+    Extension      = .otf,
+    Ligatures      = TeX,
+    ItalicFont     = BakerSignetBTRoman
+]{BakerSignetBT}
+
+
+\newjfontfamily\FontYanZhenQing[%颜真卿 中文字体使用 %http://ctan.math.washington.edu/tex-archive/macros/luatex/generic/luatexja/doc/luatexja-en.pdf 11页
+    Path           = ./Fonts/,
+    Extension      = .otf,
+    Ligatures      = TeX,
+]{YanZhenQing}

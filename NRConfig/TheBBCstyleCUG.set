@@ -1,0 +1,5 @@
+
+\newcommand{\BBCstyle}[1]{\colorbox{black}{\makebox(18.62,17.35){\textcolor{white}{#1}}}}  %-0.0475em  C
+\newcommand{\TheCUG}{
+            {\Huge \FontGillSans \BBCstyle{\hspace{-0.0475em}C}\  \BBCstyle{U}\ \BBCstyle{G}}
+}

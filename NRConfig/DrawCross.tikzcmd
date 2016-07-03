@@ -1,0 +1,14 @@
+%%画目镜十字线命令使用了线两边模糊效果,因此LaserBeamStyle.tikzset应先加载
+
+\usetikzlibrary{fadings,shadows.blur}
+
+\newcommand{\DrawCross}{
+                \begin{tikzpicture}
+                \pgfmathsetmacro{\CrossLength}{0.35} %十字线单边长度
+                \coordinate (L) at (-\CrossLength,0);
+                \coordinate (R) at (\CrossLength,0);
+                \coordinate (U) at (0,\CrossLength);
+                \coordinate (D) at (0,-\CrossLength);
+                \draw[color=red,blur shadow={shadow xshift=0pt, shadow opacity=100, shadow yshift=0,shadow blur steps=10, shadow blur radius=0.35}] (L)--(R) (U)--(D);
+                \end{tikzpicture}
+                        }

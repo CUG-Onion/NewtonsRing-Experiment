@@ -1,0 +1,259 @@
+%%%%%画产生牛顿环的实物示意图
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%计算两点间距离http://tex.stackexchange.com/questions/38473/how-can-i-compute-the-distance-between-two-coordinates-in-tikz
+\makeatletter                                                   %计算的长度单位为pt 1cm= 28.346457 pt
+\def\calcLength(#1,#2)#3{%
+\pgfpointdiff{\pgfpointanchor{#1}{center}}%
+             {\pgfpointanchor{#2}{center}}%
+\pgf@xa=\pgf@x%
+\pgf@ya=\pgf@y%
+\FPeval\@temp@a{\pgfmath@tonumber{\pgf@xa}}%
+\FPeval\@temp@b{\pgfmath@tonumber{\pgf@ya}}%
+\FPeval\@temp@sum{(\@temp@a*\@temp@a+\@temp@b*\@temp@b)}%
+\FProot{\FPMathLen}{\@temp@sum}{2}%
+\FPround\FPMathLen\FPMathLen5\relax
+\global\expandafter\edef\csname #3\endcsname{\FPMathLen}
+}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%The Eye
+%%%%%%%%%%%%http://tex.stackexchange.com/questions/94082/help-with-the-design-of-an-eye-in-tikz
+\newcommand{\Eye}{
+\def\eyepath{(-3,0) .. controls (-2,1.8) and (2,2.2) .. (2.7,0) .. controls (2,-1.2) and (-2,-1.4) .. (-3,0)--cycle;}
+\begin{tikzpicture}[scale=0.25]
+\clip\eyepath;
+\filldraw[color=orange!50!black] (-.2,.2) circle (1.5);
+\fill[color=black] (-.2,.2) circle (0.7);
+\fill[color=white] (.3,.5) circle (0.2);
+\draw[very thick]\eyepath;
+\end{tikzpicture}}
+
+
+\def\eye#1{\scalebox{#1}{
+
+\def\topedge{(-3,0) .. controls (-2,1.8) and (2,2) .. (2.3,.3)}
+\def\bottomedge{(2.3,.3) .. controls (2,-2.2) and (-2,-1.2) .. (-3,0)}
+\def\eyepath{\topedge -- \bottomedge --cycle;}
+
+\begin{tikzpicture}[scale=0.25]
+  \clip\eyepath;
+  % Iris
+    \filldraw[color=orange!30!black] (-.2,.2) circle (1.4);
+  % Shadow on iris
+    \filldraw[color=orange!40!black] (-.3,-.1) circle (1.1);
+  % Iris lines
+    \foreach \a in {0,5,...,360}{
+      \pgfmathparse{25+28*rnd}
+      \fill[orange!\pgfmathresult!black, decoration={random steps, segment length=1pt, amplitude=0.3pt}, decorate, line width=0.3pt  ] (-.2,.2) -- ++($(\a+2*rnd:.8+0.3*rnd)$) -- ++(\a+90:3pt) -- cycle;
+    }
+  % Pupil
+    \fill[color=black] (-.2,.2) circle (0.5);
+  % Sun reflection
+    \fill[color=white] (90:.8) {[rotate=-30] circle (0.2 and 0.12)};
+  % Shadow of the eyelid
+    \draw[line width=2.5mm, draw opacity=0.1, line cap=round]\topedge;
+  % Eyelids
+    \draw[line width=1mm, red!40!white!80!black, line cap=round]\bottomedge;
+    \draw[line width=1.2mm, red!40!white!60!black, line cap=round]\topedge;
+  % Lacrimal
+    \fill[red!40!white!80!black] (-2.8,0) circle (.25);
+    \fill[white] (-2.7,.1) circle (.03);
+\end{tikzpicture}
+}}
+
+\newcommand{\PutAnEye}{
+\coordinate (ViewPoint) at ($(LenCenter)+(2,-1)$); 
+\node at (ViewPoint){\eye{1}} ;
+\draw[-latex] (ViewPoint) ++(0,-1)--++(0,-5);
+}
+
+
+\pgfmathsetmacro{\LenR}{15}%透镜半径
+\pgfmathsetmacro{\GlassH}{0.8}%玻璃厚度
+\pgfmathsetmacro{\GlassWextra}{0.5}%玻璃额外宽度
+
+
+
+\newcommand{\DrawLenGlassCommon}{
+\coordinate (GlassCenterU) at ($(GlassCenterD)+(0,\GlassH)$);%玻璃上中心
+\coordinate (LenCenter) at ($(GlassCenterU)+(0,\LenR)$);%透镜曲率中心
+\coordinate (GlassLD) at ($(GlassCenterD)+(CoorL\MaxRings)+(-\GlassWextra,0)$);%玻璃左下角
+\coordinate (GlassLU) at ($(GlassCenterD)+(0,\GlassH)$);%玻璃左上角
+\coordinate (GlassRU) at ($(GlassCenterU)+(CoorR\MaxRings)+(\GlassWextra,0)$);%玻璃右上角
+\coordinate (GlassRD) at ($(GlassCenterD)+(0,-\GlassH)$);%玻璃右下角
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%计算透镜圆心角的一半
+\calcLength(GlassCenterU,GlassRU){ThetaL} %LenTheta对边
+\calcLength(GlassCenterU,LenCenter){LenRLength}%LenTheta斜边
+\pgfmathsetmacro{\LenTheta}{-asin(divide(\ThetaL,\LenRLength))}%透镜对应圆心角一半 arcsin(L/LenRLength)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%光程示意点角度
+\pgfmathsetmacro{\eRing}{int(\MaxRings-3)}%
+\calcLength(NRCenter,CoorR\eRing){eThetaL} %LenTheta对边
+\calcLength(GlassCenterU,LenCenter){LenRLength}%LenTheta斜边
+\pgfmathsetmacro{\eTheta}{-asin(divide(\eThetaL,\LenRLength))}%透镜对应圆心角一半 arcsin(L/LenRLength)
+
+\draw [pattern=custom north east lines,hatchspread=18pt,hatchthickness=1pt,opacity=0.3] (GlassLD) rectangle(GlassRU);%玻璃
+\draw [DrawLenGlass] (GlassLD) rectangle(GlassRU);%玻璃
+\draw[fill=black!80] (LenCenter) circle (0.06);
+\draw[LenGlassAuxiliaryLineDashed] let \p1 = ($(LenCenter)-(GlassCenterU)$) in (LenCenter) -- ++(-\LenTheta-90:({veclen(\x1,\y1)})coordinate (LenBoundR);) ; %透镜右边界标记
+\draw[LenGlassAuxiliaryLineDashed] let \p1 = ($(LenCenter)-(GlassCenterU)$) in (LenCenter) -- ++(\LenTheta-90:({veclen(\x1,\y1)})coordinate (LenBoundL););% 透镜左边界标记
+\draw[LenGlassAuxiliaryLine] let \p1 = ($(LenCenter)-(GlassCenterU)$) in (LenCenter) -- ++(-\eTheta-90:({veclen(\x1,\y1)})coordinate (DeltaE)node [midway,xshift=3]{\Large$R$};);% 光程 曲率半径 示意标记
+
+\draw[DrawLenGlass,name path=LenBootom] let \p1 = ($(LenCenter)-(GlassCenterU)$) in (LenCenter)  ++(-\LenTheta-90:({veclen(\x1,\y1)})arc (-\LenTheta-90:\LenTheta-90:({veclen(\x1,\y1)}););%透镜下表面
+\draw[DrawLenGlass,name path=LenTop] (LenBoundR)--(LenBoundL);%透镜上边界
+\tikzfillbetween[of=LenBootom and LenTop,on layer=,split,every even segment/.style={fill=none,draw=none},]{pattern=custom north west lines,hatchspread=18pt,hatchthickness=1pt, opacity=0.3};%填充透镜
+
+
+\draw[LenGlassAuxiliaryLine] (DeltaE)--($(GlassLU)!(DeltaE)!(GlassRU)$) node [midway,xshift=6.4]{\Large$e_k$};%光程E
+\draw[LenGlassAuxiliaryLine] (LenCenter)--($(GlassLU)!(LenCenter)!(GlassRU)$);%中心线
+\draw[LenGlassAuxiliaryLine] (DeltaE)--($(GlassCenterU)!(DeltaE)!(LenCenter)$)coordinate (VerticalSign)node [midway,yshift=5]{\Large$r_k$};%r_k
+\draw[LenGlassAuxiliaryLine] ([xshift=5]VerticalSign)|- ([yshift=5]VerticalSign); %垂直符号
+
+%%%%%%%%%%长度计算
+\draw [color=red,decorate,decoration={brace,amplitude=7.5,mirror}](LenCenter)-- (VerticalSign) node[midway,xshift=-12,rotate=90]{\Large$h=R-e$};
+
+\tagged{Draft}{
+                \draw[dashed,blue!85] (GlassRU)--([yshift=100]GlassRU);
+                \draw[dashed,blue!100] (CoorR\eRing) -- (DeltaE|-GlassCenterU) node [midway,blue,inner sep=0pt,outer sep=0pt,fill=yellow!20,fill opacity=0.6] {\Large{第$k$环}};
+}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\DrawSimpleLight}{%%光线示意图无反射镜
+
+\coordinate (LightStart0) at ($(NRCenter)+(0*\DistanceBetweenTwoLight,\DistanceBetweenLightStartEnd)$);
+\draw[YellowLight] (LightStart0)--($($(LenBoundL)!(LightStart0)!(LenBoundR)$)+(0,\DistanceBetweenLightEndLenUpper)$);
+
+\foreach \k in {1,...,\QualityOfLight}{
+\coordinate (LLightStart\k) at ($(NRCenter)+(\k*\DistanceBetweenTwoLight,\DistanceBetweenLightStartEnd)$);
+\coordinate (RLightStart\k) at ($(NRCenter)+(-\k*\DistanceBetweenTwoLight,\DistanceBetweenLightStartEnd)$);
+
+\draw[YellowLight] (LLightStart\k)--($($(LenBoundL)!(LLightStart\k)!(LenBoundR)$)+(0,\DistanceBetweenLightEndLenUpper)$);
+\draw[YellowLight] (RLightStart\k)--($($(LenBoundL)!(RLightStart\k)!(LenBoundR)$)+(0,\DistanceBetweenLightEndLenUpper)$);
+}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\DrawLightWithReflect}{%光线示意图有反射镜
+
+\pgfmathsetmacro{\ReflectTheat}{45}%反射镜角度
+\calcLength(LenBoundR,LenBoundL){ReflectWpt} % 反射镜水平长度W  pt
+\pgfmathsetmacro{\ReflectW}{\ReflectWpt/28.346457} % 反射镜水平长度W cm
+\pgfmathsetmacro{\ReflectH}{\ReflectW*tan(\ReflectTheat)} % 反射镜竖直长度H cm
+\pgfmathsetmacro{\ReflectL}{\ReflectW/cos(\ReflectTheat)} % 反射镜长度L^2=W^2+H^2
+
+\coordinate (ReflectBoundL) at ($(LenBoundL)+(0,\ReflectH)+(0,\DistanceBetweenLightEndLenUpper)$);%反射镜左边界
+\coordinate (ReflectBoundR) at ($(LenBoundR)+(0,0)+(0,\DistanceBetweenLightEndLenUpper)$);%反射镜右边界
+
+\draw (ReflectBoundR)--(ReflectBoundL); %  1cm= 28.346457 pt 反射镜
+%中心反射光线
+\coordinate (LightStart0) at ($(NRCenter)+(0*\DistanceBetweenTwoLight,\DistanceBetweenLightStartEnd)$);
+\coordinate (ReflectPointTest0) at ($(LightStart0)+(0,0.01)$);                                         
+\coordinate (ReflectPoint0) at (intersection of ReflectBoundL--ReflectBoundR and LightStart0--ReflectPointTest0);%边界与光线交点  中心反射点 
+\draw[YellowLightReflect] (ReflectPoint0)--($(LenBoundL)!(ReflectPoint0)!(LenBoundR)$);
+%中心水平入射光线
+\coordinate (LightInStartU) at ($(ReflectBoundL)-(2,0)$);
+\coordinate (LightInStartD) at ($(LenBoundL)-(2,0)$);
+\draw[YellowLightIn] ($(LightInStartU)!(ReflectPoint0)!(LightInStartD)$)--(ReflectPoint0);
+%透射光线transmission light
+\draw[YellowLightTransmission] (ReflectPoint0)--(ReflectPoint0 |- ReflectBoundL);
+
+%其余两边光线
+\foreach \k in {1,...,\QualityOfLight}{
+%左边反射光线
+\coordinate (LLightStart\k) at ($(NRCenter)+(\k*\DistanceBetweenTwoLight,\DistanceBetweenLightStartEnd)$);
+\coordinate (ReflectPointTestL\k) at ($(LLightStart\k)+(0,0.01)$);                                         
+\coordinate (ReflectPointL\k) at (intersection of ReflectBoundL--ReflectBoundR and LLightStart\k--ReflectPointTestL\k);%边界与光线交点 反射点 
+\draw[YellowLightReflect] (ReflectPointL\k)--($(LenBoundL)!(ReflectPointL\k)!(LenBoundR)$);
+
+%右边反射光线
+\coordinate (RLightStart\k) at ($(NRCenter)+(-\k*\DistanceBetweenTwoLight,\DistanceBetweenLightStartEnd)$);
+\coordinate (ReflectPointTestR\k) at ($(RLightStart\k)+(0,0.01)$);                                         
+\coordinate (ReflectPointR\k) at (intersection of ReflectBoundL--ReflectBoundR and RLightStart\k--ReflectPointTestR\k);%边界与光线交点 反射点 
+\draw[YellowLightReflect] (ReflectPointR\k)--($(LenBoundL)!(ReflectPointR\k)!(LenBoundR)$);
+
+%水平入射光线
+\draw[YellowLightIn] ($(LightInStartU)!(ReflectPointL\k)!(LightInStartD)$)--(ReflectPointL\k);
+\draw[YellowLightIn] ($(LightInStartU)!(ReflectPointR\k)!(LightInStartD)$)--(ReflectPointR\k);
+%透射光线transmission light
+\draw[YellowLightTransmission] (ReflectPointL\k)--(ReflectPointL\k |- ReflectBoundL);
+\draw[YellowLightTransmission] (ReflectPointR\k)--(ReflectPointR\k |- ReflectBoundL);
+
+}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\DrawLenGlassWithoutAuxiliaryLineCommon}{
+
+\coordinate (GlassCenterU) at ($(GlassCenterD)+(0,\GlassH)$);%玻璃上中心
+\coordinate (LenCenter) at ($(GlassCenterU)+(0,\LenR)$);%透镜曲率中心
+\coordinate (GlassLD) at ($(GlassCenterD)+(CoorL\MaxRings)+(-\GlassWextra,0)$);%玻璃左下角
+\coordinate (GlassLU) at ($(GlassCenterD)+(0,\GlassH)$);%玻璃左上角
+\coordinate (GlassRU) at ($(GlassCenterU)+(CoorR\MaxRings)+(\GlassWextra,0)$);%玻璃右上角
+\coordinate (GlassRD) at ($(GlassCenterD)+(0,-\GlassH)$);%玻璃右下角
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%计算透镜圆心角的一半
+\calcLength(GlassCenterU,GlassRU){ThetaL} %LenTheta对边
+\calcLength(GlassCenterU,LenCenter){LenRLength}%LenTheta斜边
+\pgfmathsetmacro{\LenTheta}{-asin(divide(\ThetaL,\LenRLength))}%透镜对应圆心角一半 arcsin(L/LenRLength)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%光程示意点角度
+\pgfmathsetmacro{\eRing}{int(\MaxRings-3)}%
+\calcLength(NRCenter,CoorR\eRing){eThetaL} %LenTheta对边
+\calcLength(GlassCenterU,LenCenter){LenRLength}%LenTheta斜边
+\pgfmathsetmacro{\eTheta}{-asin(divide(\eThetaL,\LenRLength))}%透镜对应圆心角一半 arcsin(L/LenRLength)
+
+\draw [pattern=custom north east lines,hatchspread=18pt,hatchthickness=1pt,opacity=0.3] (GlassLD) rectangle(GlassRU);%玻璃
+\draw [DrawLenGlass] (GlassLD) rectangle(GlassRU);%玻璃
+\draw[DrawLenGlass,dash pattern=on 1 off 1] let \p1 = ($(LenCenter)-(GlassCenterU)$) in (LenCenter)  ++(-\LenTheta-90:({veclen(\x1,\y1)})coordinate (LenBoundR);) ; %透镜右边界标记
+\draw[DrawLenGlass,dash pattern=on 1 off 1] let \p1 = ($(LenCenter)-(GlassCenterU)$) in (LenCenter)  ++(\LenTheta-90:({veclen(\x1,\y1)})coordinate (LenBoundL););% 透镜左边界标记
+\draw[DrawLenGlass,name path=LenBootom] let \p1 = ($(LenCenter)-(GlassCenterU)$) in (LenCenter)  ++(-\LenTheta-90:({veclen(\x1,\y1)})arc (-\LenTheta-90:\LenTheta-90:({veclen(\x1,\y1)}););%透镜下表面
+\draw[DrawLenGlass,name path=LenTop] (LenBoundR)--(LenBoundL);%透镜上边界
+\tikzfillbetween[of=LenBootom and LenTop,on layer=,split,every even segment/.style={fill=none,draw=none},]{pattern=custom north west lines,hatchspread=18pt,hatchthickness=1pt, opacity=0.3};%填充透镜
+
+%%光线示意
+\pgfmathsetmacro{\DistanceBetweenTwoLight}{0.5}%光线间距离
+\pgfmathsetmacro{\DistanceBetweenLightStartEnd}{3}%光线长度
+\pgfmathsetmacro{\DistanceBetweenLightEndLenUpper}{1}%光线与透镜上表面距离
+\pgfmathsetmacro{\QualityOfLight}{\MaxRings/2.5}%光线条数
+
+%\DrawLightWithReflect   %光线示意图有反射镜
+\DrawSimpleLight       %光线示意图无反射镜
+
+\tagged{Draft}{
+                \draw[dashed,blue!85] (GlassRU)--([yshift=100]GlassRU);
+}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+\newcommand{\DrawLenGlassOnlyWithAuxiliaryLine}{
+    \coordinate (GlassCenterD) at ($(0,-0.2)-(CoorUU\MaxRings)$); %玻璃下中心
+    \DrawLenGlassCommon
+
+}
+
+\newcommand{\DrawLenGlassWithRings}{
+    \coordinate (GlassCenterD) at ($(0,0.2)+(CoorUU\MaxRings)$); %玻璃下中心
+    \DrawLenGlassCommon
+    \draw[line width=1.5,dashed,blue!100] (CoorR\eRing) -- (DeltaE|-GlassCenterU) node [midway,blue,inner sep=0pt,outer sep=0pt,fill=yellow!20,fill opacity=0.88] {\Large{\FontYanZhenQing 第$k$环}};
+    \draw[line width=1.5,dashed,blue!100] (NRCenter) -- (GlassCenterU) node [midway,blue,inner sep=0pt,outer sep=0pt,fill=yellow!20,fill opacity=0.88] {\Large{\FontYanZhenQing  第$0$环}};
+}
+
+\newcommand{\DrawLenGlassWithoutAuxiliaryLine}{
+%\clip (-5.88,-5.6) rectangle (5.88,-3.55);
+\coordinate (GlassCenterD) at ($(0,-0.2)-(CoorUU\MaxRings)$); %玻璃下中心
+%\draw (-7,-7) to[grid with coordinates] (7,4);
+\DrawLenGlassWithoutAuxiliaryLineCommon}

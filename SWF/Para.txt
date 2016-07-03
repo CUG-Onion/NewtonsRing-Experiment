@@ -1,0 +1,19 @@
+
+::设置环境变量
+set PATH="%CD%\SWFTools";"%CD%\NRConfig\ViewerTemplate";%PATH%
+
+::非动画时
+pdf2swf.exe -v --zlib -j 100 -S -f -T 9  -w   --set  drawonlyshapes  --set storeallcharacters --set enablezlib --set bboxvars --set dots   --set flashversion=9   --set animate  --output NetonRing.swf NetonRing.pdf
+
+::动画时
+
+
+:: 1、框架准备
+pdf2swf.exe -v --zlib -j 100 -S -f -T 9  -w -B "SWF\Viewer.swf" --set framerate=1 --set  drawonlyshapes  --set storeallcharacters --set enablezlib --set bboxvars --set dots   --set flashversion=9   --set animate  --output NetonRing.swf NetonRing.pdf
+::2、动画
+pdf2swf.exe -v --zlib -j 100 -S -f -T 9  -w -B "%CD%\NRConfig\ViewerTemplate\3ViewerTemplate.swf" --set framerate=1 --set  drawonlyshapes  --set storeallcharacters --set enablezlib --set bboxvars --set dots   --set flashversion=9   --set animate  --output NetonRing.swf NetonRing.pdf
+
+pdf2swf.exe -v --zlib -j 100 -S -f -T 9  -w -B "%CD%\NRConfig\ViewerTemplate\5ViewerTemplate.swf" --set framerate=1 --set  drawonlyshapes  --set storeallcharacters --set enablezlib --set bboxvars --set dots   --set flashversion=9   --set animate  --output NetonRing.swf NetonRing.pdf
+
+
+

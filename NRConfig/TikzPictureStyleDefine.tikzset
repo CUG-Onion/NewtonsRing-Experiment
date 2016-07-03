@@ -1,0 +1,22 @@
+\tikzset{
+   ZeroRing/.style={inner color=black!90, outer   color=black!80!yellow,laser beam=black},%第0环
+   FirstRing/.style={line width=4,laser beam=black},%第一环
+   OtherRing/.style={line width={0.5+(7*\R)/(\k*\M)},laser beam=black},%其它环
+   ShadeRing/.style={line width={0.5+(7*\R)/(\k*\M)},laser beam=black!43},%变淡环
+   nodeNumberDrawStyle/.style={line width=1,red,-latex}, %怎么数环指示线 %,dash pattern=on 1 off 1
+   CADboundariesStyle/.style={line width=1,draw opacity=0.9}, %CAD尺寸黑色边界线样式
+   CADboundariesStyleRed/.style={line width=1,draw opacity=0.9,color=red!95},%CAD尺寸红色边界线样式
+   DrawDiaSStyle/.style={line width=1.2,color=black!100},%s环直径样式
+   DrawDiaMStyle/.style={line width=1.2,color=black!85},%m环直径样式
+   DrawLSStyle/.style={line width=1,color=red!100},%s环弦样式
+   DrawLMStyle/.style={line width=1,color=red!90},%m环弦样式
+   DrawLenGlass/.style={line width=1,color=black!100},%牛顿环装置线条样式
+   LenGlassAuxiliaryLine/.style={line width=1,color=red!82},%辅助线
+   LenGlassAuxiliaryLineDashed/.style={LenGlassAuxiliaryLine,dash pattern=on 1 off 1},%辅助线 虚线   
+   YellowLight/.style={line width=0.5,laser beam=red!100,decoration={markings,mark=at position 0.5 with {\arrow{stealth}}},postaction={decorate}},%光线
+   YellowLightIn/.style={line width=0.5,laser beam=red!100,decoration={markings,mark=at position 2cm with {\arrow{stealth}}},postaction={decorate}},%水平入射光线
+   YellowLightReflect/.style={line width=0.5,laser beam=red!75,decoration={markings,mark=at position -2cm with {\arrow{stealth}\arrowreversed{stealth}}},postaction={decorate}},%反射光线
+   YellowLightTransmission/.style={line width=0.5,laser beam=red!50,decoration={markings,mark=at position 0.5 with {\arrow{stealth} }},postaction={decorate}},%透射光线
+   SpyStyle/.style={size=120,latex-,color=red,every spy on node/.append style={line width=2.5},every spy in node/.append style={line width=4}},%鹰眼样式  
+   ReadPointIndicate/.style={rectangle callout,draw=purple,fill=red!45,decoration={Koch snowflake,segment length=0.5,random steps,amplitude=0.34},decorate,inner sep=0pt,,align=left},%读数位置提醒样式
+}

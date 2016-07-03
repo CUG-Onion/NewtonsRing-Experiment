@@ -1,0 +1,32 @@
+%%%%%%%%%%%%%%%环数标识0-8 ......%%%%%%%%%%%%%%%%%%%%
+\pgfmathsetmacro{\nodeNumberYshift}{-155}%环数标识y偏移量
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcounter{Counter1}
+\setcounter{Counter1}{0}
+\newcounter{Counter2}
+\setcounter{Counter2}{-1}
+
+\newcommand{\PointOutCenter}{\draw[nodeNumberDrawStyle] (NRCenter)--([yshift=\nodeNumberYshift] NRCenter) node[yshift=-4.4,red,red]{\large$\mbox{\FontGillSans 0}$};}
+\newcommand{\PointOutLRing}{\draw[nodeNumberDrawStyle] (CoorL\k)--([yshift=\nodeNumberYshift]CoorL\k)  node[yshift=-4.4,red,red]{\ifnumcomp{\k}{<}{\PointOutRingMax}{\large$\mbox{\FontGillSans \k}$}{}};}
+\newcommand{\PointOutRRing}{\draw[nodeNumberDrawStyle] (CoorR\k)--([yshift=\nodeNumberYshift]CoorR\k)  node[yshift=-4.4,red,red]{\ifnumcomp{\k}{<}{\PointOutRingMax}{\large$\mbox{\FontGillSans \k}$}{}};}
+
+%显示怎么数环
+\newcommand{\IndicateRingNumber}{
+\ifnumcomp{\number\value{Counter1}}{>}{0}{
+    \ifnumcomp{\number\value{Counter1}}{<}{2}{
+                                                \PointOutCenter
+                                            }{
+                                                \foreach \k in {1,...,{\number\value{Counter2}}}{
+                                                                                                 \PointOutCenter
+                                                                                                 \PointOutLRing
+                                                                                                 \PointOutRRing}
+}
+\ifnumcomp{\number\value{Counter2}}{=}{\PointOutRingMax}{
+            \draw[nodeNumberDrawStyle] (CoorL\PointOutRingMax)--([yshift=\nodeNumberYshift]CoorL\PointOutRingMax)  node[xshift=-6,yshift=-4.2,red,red]{\large \FontGillSans $\cdots$};
+            \draw[nodeNumberDrawStyle] (CoorR\PointOutRingMax)--([yshift=\nodeNumberYshift]CoorR\PointOutRingMax)  node[xshift=8,yshift=-4.2,red,red]{\large \FontGillSans $\cdots$};}}{}
+%%%执行完一次计数器增加
+\stepcounter{Counter1}
+\stepcounter{Counter2}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

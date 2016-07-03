@@ -1,0 +1,14 @@
+%线两边模糊效果
+\tikzset{
+  laser beam action/.style={
+    line width=\pgflinewidth+0.15,draw opacity=.25,draw=#1,
+  },
+  laser beam recurs/.code 2 args={%
+    \pgfmathtruncatemacro{\level}{#1-1}%
+    \ifthenelse{\equal{\level}{0}}%
+    {\tikzset{preaction={laser beam action=#2}}}%
+    {\tikzset{preaction={laser beam action=#2,laser beam recurs={\level}{#2}}}}
+         },
+  laser beam/.style={preaction={laser beam recurs={5}{#1}},draw opacity=0.85,draw=#1},
+}
+
